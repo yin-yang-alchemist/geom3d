@@ -1,10 +1,5 @@
 import kotlin.math.sqrt
-
-fun main() {
-    val vec = Vector3(1.0, 2.0, 3.0)
-    println(vec)
-    println(Vector3.unitZ cross Vector3.unitX)
-}
+import kotlin.random.Random
 
 /**
  * 3次元ベクトル
@@ -22,19 +17,25 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
         val unitX = Vector3(1.0, 0.0, 0.0)
         val unitY = Vector3(0.0, 1.0, 0.0)
         val unitZ = Vector3(0.0, 0.0, 1.0)
+        fun random() = Vector3(1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble())
     }
 
     val length: Double = sqrt(x * x + y * y + z * z)
 
     fun normalize() = this / this.length
 
+    // 演算子のオーバーロード
+    operator fun unaryMinus() = Vector3(-x, -y, -z)
+
     operator fun plus(other: Vector3) = Vector3(x + other.x, y + other.y, z + other.z)
-
     operator fun minus(other: Vector3) = Vector3(x - other.x, y - other.y, z - other.z)
-
-    operator fun times(k: Double) = Vector3(k * x, k * y, k * z)
-
+    operator fun times(scalar: Double) = Vector3(scalar * x, scalar * y, scalar * z)
     operator fun div(k: Double) = Vector3(x / k, y / k, z / k)
+    override fun equals(other: Any?) =
+        when (other) {
+            is Vector3 -> x == other.x && y == other.y && z == other.z
+            else -> false
+        }
 
     infix fun dot(other: Vector3) = x * other.x + y * other.y + z * other.z
 
