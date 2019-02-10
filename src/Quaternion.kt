@@ -41,14 +41,15 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
         return Vector3(unit.x / sin_theta_half, unit.y / sin_theta_half, unit.z / sin_theta_half)
     }
 
-    // TODO: ノルムが１ではない場合を顧慮する
     /** 回転行列に変換する */
-    fun toMatrix(): Matrix3 =
-        Matrix3(
+    fun toMatrix(): Matrix3 {
+        val (x, y, z, w) = this.unit
+        return Matrix3(
             Vector3(x * x - y * y - z * z + w * w, 2 * (x * y - z * w), 2 * (x * z + y * w)),
             Vector3(2 * (x * y + z * w), -x * x + y * y - z * z + w * w, 2 * (y * z - x * w)),
             Vector3(2 * (x * z - y * x), 2 * (x * y + z * w), -x * x - y * y + z * z + w * w)
         )
+    }
 
     /**
      * クォータニオンの生成に使う機能
@@ -75,7 +76,6 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
                 }
             }
 
-        // TODO: 未実装
         /**
          * 回転行列からクォータニオンに変換する
          */
