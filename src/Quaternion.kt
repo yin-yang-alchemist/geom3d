@@ -17,15 +17,8 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
     constructor(vec: Vector3, w: Double) : this(vec.x, vec.y, vec.z, w)
 
     // 演算子のオーバーロード
-    operator fun plus(other: Quaternion) =
-        Quaternion(x + other.x, y + other.y, z + other.z, w + other.w)
-
-    operator fun times(k: Double) =
-        Quaternion(k * x, k * y, k * z, k * w)
-
-    operator fun div(k: Double) =
-        Quaternion(x / k, y / k, z / k, w / k)
-
+    operator fun times(k: Double) = Quaternion(k * x, k * y, k * z, k * w)
+    operator fun div(k: Double) = Quaternion(x / k, y / k, z / k, w / k)
     operator fun times(other: Quaternion): Quaternion {
         val vec1 = Vector3(this.x, this.y, this.z)
         val vec2 = Vector3(other.x, other.y, other.z)
