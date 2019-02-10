@@ -2,6 +2,15 @@ import kotlin.math.*
 
 /**
  * クォータニオン
+ * @property x      第１成分
+ * @property y      第２成分
+ * @property z      第３成分
+ * @property w      第４成分
+ * @property isUnit 単位クォータニオンかどうかの判定
+ * @property norm   ノルム
+ * @property inv    逆元
+ * @property angle  回転角度
+ * @property axis   回転軸
  */
 data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double) {
 
