@@ -9,7 +9,7 @@ fun main() {
 //    println(a.inverse()!! * a)
 //    println(a * a.inverse()!!)
     println(Matrix3.createCsys(Vector3.unitX * (-2.0), Vector3.unitZ))
-    val mat = Matrix3.createCsys(Vector3.random(), Vector3.random())!!
+    val mat = Matrix3.createCsys(Vector3.random(), Vector3.random())
     println(mat)
     println(mat.i dot mat.j)
     println(mat.j dot mat.k)
@@ -39,23 +39,15 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
         /**
          * 方向余弦行列を作成する。
          */
-        fun createCsys(i: Vector3, j: Vector3): Matrix3? {
-            val iUnit = i.normalize()
-            val jOrtho = j - iUnit * (iUnit dot j)   // iに垂直になるように修正したj
-            val jUnit = jOrtho.normalize()
-            val kUnit = iUnit cross jUnit
-            return when {
-                iUnit.length < 1e-9 -> null
-                jUnit.length < 1e-9 -> null
-                kUnit.length < 1e-9 -> null
-                else -> Matrix3(iUnit, jUnit, kUnit)
-            }
+        fun createCsys(i: Vector3, j: Vector3): Matrix3 {
+            val jOrtho = j - i.unit * (i.unit dot j)    // iに垂直になるように修正したj
+            val k = i.unit cross jOrtho.unit
+            return Matrix3(i.unit, jOrtho.unit, k)
         }
 
         /**
          * 回転軸と回転角度から回転行列を作成する。
-         * ロドリゲスの回転公式 - Wikipedia
-         * https://ja.wikipedia.org/wiki/ロドリゲスの回転公式
+         * [ロドリゲスの回転公式 - Wikipedia](https://ja.wikipedia.org/wiki/ロドリゲスの回転公式)
          */
         fun createRotation(axis: Vector3, theta: Double): Matrix3 {
             val (x, y, z) = axis
@@ -85,6 +77,7 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
 
     // 演算子のオーバーロード
     operator fun plus(other: Matrix3) = Matrix3(i + other.i, j + other.j, k + other.k)
+
     operator fun minus(other: Matrix3) = Matrix3(i - other.i, j - other.j, k - other.k)
     operator fun times(scalar: Double) = Matrix3(i * scalar, j * scalar, k * scalar)
     operator fun times(vec: Vector3) = Vector3(i dot vec, j dot vec, k dot vec)

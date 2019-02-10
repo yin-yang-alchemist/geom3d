@@ -1,4 +1,4 @@
-import kotlin.math.sqrt
+import kotlin.math.*
 import kotlin.random.Random
 
 /**
@@ -20,9 +20,9 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
         fun random() = Vector3(1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble())
     }
 
-    val length: Double = sqrt(x * x + y * y + z * z)
-
-    fun normalize() = this / this.length
+    val isUnit: Boolean by lazy { (x * x + y * y + z * z).isClose(1.0) }
+    val length: Double by lazy { sqrt(x * x + y * y + z * z) }
+    val unit: Vector3 by lazy { this / this.length}
 
     // 演算子のオーバーロード
     operator fun unaryMinus() = Vector3(-x, -y, -z)
@@ -45,6 +45,14 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
             this.z * other.x - this.x * other.z,
             this.x * other.y - this.y * other.x
         )
+
+    fun isClose(other: Vector3) = x.isClose(other.x) && y.isClose(other.y) && z.isClose(other.z)
+
+    // TODO: 別のベクトルに対する角度を求める
+
+    // TODO: 別のベクトルに対する垂直成分を求める
+
+    // TODO: 別のベクトルに対する平行成分を求める
 
     fun toList() = listOf(x, y, z)
 
