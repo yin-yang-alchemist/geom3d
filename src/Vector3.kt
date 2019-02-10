@@ -9,20 +9,7 @@ import kotlin.random.Random
  */
 data class Vector3(val x: Double, val y: Double, val z: Double) {
 
-    /**
-     * @property zero   ゼロベクトル
-     * @property unitX  X方向の単位ベクトル
-     * @property unitY  Y方向の単位ベクトル
-     * @property unitZ  Z方向の単位ベクトル
-     */
-    companion object {
-        val zero = Vector3(0.0, 0.0, 0.0)
-        val unitX = Vector3(1.0, 0.0, 0.0)
-        val unitY = Vector3(0.0, 1.0, 0.0)
-        val unitZ = Vector3(0.0, 0.0, 1.0)
-        fun random() = Vector3(1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble())
-    }
-
+   // プロパティ
     val isUnit: Boolean by lazy { (x * x + y * y + z * z).isClose(1.0) }
     val length: Double by lazy { sqrt(x * x + y * y + z * z) }
     val unit: Vector3 by lazy { this / this.length }
@@ -66,4 +53,18 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
     fun toList() = listOf(x, y, z)
 
     override fun toString(): String = "[%7.4f, %7.4f, %7.4f]".format(x, y, z)
+
+    /**
+     * @property zero   ゼロベクトル
+     * @property unitX  X方向の単位ベクトル
+     * @property unitY  Y方向の単位ベクトル
+     * @property unitZ  Z方向の単位ベクトル
+     */
+    companion object {
+        val zero = Vector3(0.0, 0.0, 0.0)
+        val unitX = Vector3(1.0, 0.0, 0.0)
+        val unitY = Vector3(0.0, 1.0, 0.0)
+        val unitZ = Vector3(0.0, 0.0, 1.0)
+        fun random() = Vector3(1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble())
+    }
 }
