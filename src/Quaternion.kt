@@ -78,9 +78,44 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
 
         /**
          * 回転行列からクォータニオンに変換する
+         * [MATLAB によるクォータニオン数値計算](http://www.mss.co.jp/technology/report/pdf/19-08.pdf)
          */
         fun createFromMatrix(mat: Matrix3): Quaternion? {
-            throw  NotImplementedError()
+            if (!mat.isOrthogonal) {
+                return null
+            } else {
+                val q1 = sqrt(1.0 + mat.i.x - mat.j.y - mat.k.z) / 2
+                val q2 = sqrt(1.0 - mat.i.x + mat.j.y - mat.k.z) / 2
+                val q3 = sqrt(1.0 - mat.i.x - mat.j.y + mat.k.z) / 2
+                val q4 = sqrt(1.0 + mat.i.x + mat.j.y + mat.k.z) / 2
+                val maxIndex = (0..3).maxBy { listOf(q1, q2, q3, q4)[it] }
+                return when (maxIndex) {
+                    0 -> Quaternion(
+                        q1,
+                        (mat.i.y + mat.j.x) / (4 * q1),
+                        (mat.i.z + mat.k.x) / (4 * q1),
+                        (mat.j.z - mat.k.y) / (4 * q1)
+                    )
+                    1 -> Quaternion(
+                        (mat.i.y + mat.j.x) / (4 * q2),
+                        q2,
+                        (mat.k.y + mat.j.z) / (4 * q2),
+                        (mat.k.x - mat.i.z) / (4 * q2)
+                    )
+                    2 -> Quaternion(
+                        (mat.k.x + mat.i.z) / (4 * q3),
+                        (mat.k.y + mat.j.z) / (4 * q3),
+                        q3,
+                        (mat.i.y - mat.j.x) / (4 * q3)
+                    )
+                    else -> Quaternion(
+                        (mat.j.z - mat.k.y) / (4 * q4),
+                        (mat.k.x - mat.i.z) / (4 * q4),
+                        (mat.i.y - mat.j.x) / (4 * q4),
+                        q4
+                    )
+                }
+            }
         }
     }
 }
