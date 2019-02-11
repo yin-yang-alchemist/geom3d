@@ -1,18 +1,29 @@
 import kotlin.math.*
 import kotlin.random.Random
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.Assertions.*
 
 internal class QuaternionTest {
 
+    /** 許容値 */
+    private val TOL = 1e-9
+
+    /** Vector3をJava配列に変換する（assertArrayEqualsに渡すため） */
+    private fun Vector3.toArray() = doubleArrayOf(x, y, z)
+
+    /** Matrix3をJava配列に変換する（assertArrayEqualsに渡すため） */
+    private fun Matrix3.toArray() = doubleArrayOf(i.x, i.y, i.z, j.x, j.y, j.z, k.x, k.y, k.z)
+
+    /** QuaternionをJava配列に変換する（assertArrayEqualsに渡すため） */
+    private fun Quaternion.toArray() = doubleArrayOf(x, y, z, w)
+
     @Test
     fun getNorm() {
-        assertEquals(0.0, Quaternion(Vector3.zero, 0.0).norm)
-        assertEquals(1.0, Quaternion(Vector3.unitX, 0.0).norm)
-        assertEquals(1.0, Quaternion(Vector3.unitY, 0.0).norm)
-        assertEquals(1.0, Quaternion(Vector3.unitZ, 0.0).norm)
-        assertEquals(6.0, Quaternion(3.0, 3.0, 3.0, 3.0).norm)
+        assertEquals(0.0, Quaternion(Vector3.zero, 0.0).norm, TOL)
+        assertEquals(1.0, Quaternion(Vector3.unitX, 0.0).norm, TOL)
+        assertEquals(1.0, Quaternion(Vector3.unitY, 0.0).norm, TOL)
+        assertEquals(1.0, Quaternion(Vector3.unitZ, 0.0).norm, TOL)
+        assertEquals(6.0, Quaternion(3.0, 3.0, 3.0, 3.0).norm, TOL)
     }
 
     @Test
@@ -20,7 +31,7 @@ internal class QuaternionTest {
         // 単位クォータニオンのノルムが１であることをチェックする。
         for (count in 1..100) {
             val quat = Quaternion(Vector3.random(), Random.nextDouble())
-            assertTrue(quat.unit.norm.isClose(1.0))
+            assertEquals(1.0, quat.unit.norm, TOL)
         }
     }
 
@@ -29,7 +40,7 @@ internal class QuaternionTest {
         // 逆元をかけると(0, 0, 0, 1)になることをチェックする。
         for (count in 1..100) {
             val quat = Quaternion(Vector3.random(), Random.nextDouble())
-            assertTrue((quat * quat.inv).isClose(Quaternion.identity))
+            assertArrayEquals(Quaternion.identity.toArray(), (quat * quat.inv).toArray(), TOL)
         }
     }
 
@@ -39,7 +50,7 @@ internal class QuaternionTest {
         for (count in 1..100) {
             val angle = Random.nextDouble()
             val quat = Quaternion.createRotation(Vector3.random(), angle)
-            if (quat != null) assertTrue(quat.angle.isClose(angle))
+            if (quat != null) assertEquals(angle, quat.angle, TOL)
         }
     }
 
@@ -61,10 +72,10 @@ internal class QuaternionTest {
         for (count in 1..100) {
             val quat1 = Quaternion(Vector3.random(), Random.nextDouble())
             val quat2 = Quaternion(Vector3.random(), Random.nextDouble())
-            assertTrue((quat1 * quat2).norm.isClose(quat1.norm * quat2.norm))
+            assertEquals(quat1.norm * quat2.norm, (quat1 * quat2).norm, TOL)
         }
         // 同じ回転軸をもつ２つのクォータニオンの積の回転角度が、２つの回転角度の和になっていることをチェックする。
-        // ２つの角度の和がπを超えないことが前提
+        // ２つの角度の和がーπ〜πの範囲にあることが前提
         for (count in 1..100) {
             val axis = Vector3.random()
             val angle1 = Random.nextDouble()
@@ -72,7 +83,7 @@ internal class QuaternionTest {
             val quat1 = Quaternion.createRotation(axis, angle1)
             val quat2 = Quaternion.createRotation(axis, angle2)
             if (quat1 != null && quat2 != null) {
-                assertTrue((quat1 * quat2).angle.isClose(angle1 + angle2))
+                assertEquals(angle1 + angle2, (quat1 * quat2).angle, TOL)
             }
         }
     }
@@ -82,13 +93,13 @@ internal class QuaternionTest {
         // 各軸周り60度回転の回転行列が正しいことをチェックする。
         val quat_x60deg = Quaternion.createRotation(Vector3.unitX, PI / 3)!!
         val mat_x60deg = Matrix3.createRotation(Vector3.unitX, PI / 3)!!
-        assertTrue(quat_x60deg.toMatrix().isClose(mat_x60deg))
+        assertArrayEquals(mat_x60deg.toArray(), quat_x60deg.toMatrix().toArray(), TOL)
         val quat_y60deg = Quaternion.createRotation(Vector3.unitY, PI / 3)!!
         val mat_y60deg = Matrix3.createRotation(Vector3.unitY, PI / 3)!!
-        assertTrue(quat_y60deg.toMatrix().isClose(mat_y60deg))
+        assertArrayEquals(mat_y60deg.toArray(), quat_y60deg.toMatrix().toArray(), TOL)
         val quat_z60deg = Quaternion.createRotation(Vector3.unitZ, PI / 3)!!
         val mat_z60deg = Matrix3.createRotation(Vector3.unitZ, PI / 3)!!
-        assertTrue(quat_z60deg.toMatrix().isClose(mat_z60deg))
+        assertArrayEquals(mat_z60deg.toArray(), quat_z60deg.toMatrix().toArray(), TOL)
         // 直接作成した回転行列とクォータニオンから作成した回転行列が等しいことをチェックする。
         for (count in 1..100) {
             val axis = Vector3.random()
@@ -96,7 +107,7 @@ internal class QuaternionTest {
             val mat = Matrix3.createRotation(axis, angle)
             val quat = Quaternion.createRotation(axis, angle)
             if (quat != null && mat != null) {
-                assertTrue(quat.toMatrix().isClose(mat))
+                assertArrayEquals(mat.toArray(), quat.toMatrix().toArray(), TOL)
             }
         }
     }
@@ -110,7 +121,7 @@ internal class QuaternionTest {
             val z = Random.nextDouble()
             val w = Random.nextDouble()
             val quat = Quaternion.createUnit(x, y, z, w)
-            assertTrue(quat.norm.isClose(1.0))
+            assertEquals(1.0, quat.norm, TOL)
         }
     }
 
@@ -119,7 +130,7 @@ internal class QuaternionTest {
         // 回転角度０で作成したクォータニオンが(0, 0, 0, 1)であることをチェックする。
         for (count in 1..100) {
             val quat = Quaternion.createRotation(Vector3.random(), 0.0)
-            if (quat != null) assertTrue(quat.isClose(Quaternion.identity))
+            if (quat != null) assertArrayEquals(Quaternion.identity.toArray(), quat.toArray(), TOL)
         }
         // 回転軸・回転角度がクォータニオンを作成時に指定した回転軸・回転角度と等しいことをチェックする。
         for (count in 1..100) {
@@ -127,7 +138,7 @@ internal class QuaternionTest {
             val angle = Random.nextDouble()
             val quat = Quaternion.createRotation(axis, angle)
             if (quat != null) {
-                assertTrue(quat.angle.isClose(angle))
+                assertEquals(angle, quat.angle, TOL)
                 assertTrue(quat.axis.isClose(axis.unit) || quat.axis.isClose(-axis.unit))
             }
         }
@@ -139,7 +150,7 @@ internal class QuaternionTest {
         for (count in 1..100) {
             val mat = Matrix3.createCsys(Vector3.random(), Vector3.random())
             val quat = Quaternion.createFromMatrix(mat)!!
-            assertTrue(quat.toMatrix().isClose(mat))
+            assertArrayEquals(mat.toArray(), quat.toMatrix().toArray(), TOL)
         }
         // 回転行列から変換したクォータニオンの回転軸・回転角度が正しいことをチェックする。
         for (count in 1..100) {
@@ -149,8 +160,8 @@ internal class QuaternionTest {
             if (mat != null) {
                 val quat = Quaternion.createFromMatrix(mat)
                 if (quat != null) {
-                    assertTrue(quat.axis.isClose(axis.unit))
-                    assertTrue(quat.angle.isClose(angle))
+                    assertArrayEquals(axis.unit.toArray(), quat.axis.toArray(), TOL)
+                    assertEquals(angle, quat.angle, TOL)
                 }
             }
         }
