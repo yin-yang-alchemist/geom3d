@@ -8,6 +8,7 @@ import kotlin.math.*
  * @property w      第４成分
  * @property isUnit 単位クォータニオンかどうかの判定
  * @property norm   ノルム
+ * @property unit   単位クォータニオン
  * @property inv    逆元
  * @property angle  回転角度
  * @property axis   回転軸
@@ -59,10 +60,10 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
     /** 回転行列に変換する */
     fun toMatrix(): Matrix3 {
         val (x, y, z, w) = this.unit
-        return Matrix3(
-            Vector3(x * x - y * y - z * z + w * w, 2 * (x * y + z * w), 2 * (x * z - y * w)),
-            Vector3(2 * (x * y - z * w), -x * x + y * y - z * z + w * w, 2 * (y * z + x * w)),
-            Vector3(2 * (x * z + y * w), 2 * (y * z - x * w), -x * x - y * y + z * z + w * w)
+        return Matrix3.create(
+            x * x - y * y - z * z + w * w, 2 * (x * y - z * w), 2 * (x * z + y * w),
+            2 * (x * y + z * w), -x * x + y * y - z * z + w * w, 2 * (y * z - x * w),
+            2 * (x * z - y * w), 2 * (y * z + x * w), -x * x - y * y + z * z + w * w
         )
     }
 

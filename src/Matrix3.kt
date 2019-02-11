@@ -87,6 +87,20 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
         fun random() = Matrix3(Vector3.random(), Vector3.random(), Vector3.random())
 
         /**
+         * 要素から行列を作成する。
+         */
+        fun create(
+            ix: Double, jx: Double, kx: Double,
+            iy: Double, jy: Double, ky: Double,
+            iz: Double, jz: Double, kz: Double
+        ): Matrix3 {
+            val i = Vector3(ix, iy, iz)
+            val j = Vector3(jx, jy, jz)
+            val k = Vector3(kx, ky, kz)
+            return Matrix3(i, j, k)
+        }
+
+        /**
          * 対角行列を作成する。
          */
         fun createDiag(x: Double, y: Double, z: Double) =
@@ -105,29 +119,18 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
          * 回転軸と回転角度から回転行列を作成する。
          * [ロドリゲスの回転公式 - Wikipedia](https://ja.wikipedia.org/wiki/ロドリゲスの回転公式)
          */
-        fun createRotation(axis: Vector3, theta: Double): Matrix3? {
+        fun createRotation(axis: Vector3, angle: Double): Matrix3? {
             if (axis.isClose(Vector3.zero)) {
                 return null
             } else {
                 val (x, y, z) = axis.unit
-                val cosTheta = cos(theta)
-                val sinTheta = sin(theta)
-                val i = Vector3(
-                    cosTheta + x * x * (1 - cosTheta),
-                    x * y * (1 - cosTheta) + z * sinTheta,
-                    z * x * (1 - cosTheta) - y * sinTheta
+                val cos_ = cos(angle)
+                val sin_ = sin(angle)
+                return Matrix3.create(
+                    cos_ + x * x * (1 - cos_), x * y * (1 - cos_) - z * sin_, z * x * (1 - cos_) + y * sin_,
+                    x * y * (1 - cos_) + z * sin_, cos_ + y * y * (1 - cos_), y * z * (1 - cos_) - x * sin_,
+                    z * x * (1 - cos_) - y * sin_, y * z * (1 - cos_) + x * sin_, cos_ + z * z * (1 - cos_)
                 )
-                val j = Vector3(
-                    x * y * (1 - cosTheta) - z * sinTheta,
-                    cosTheta + y * y * (1 - cosTheta),
-                    y * z * (1 - cosTheta) + x * sinTheta
-                )
-                val k = Vector3(
-                    z * x * (1 - cosTheta) + y * sinTheta,
-                    y * z * (1 - cosTheta) - x * sinTheta,
-                    cosTheta + z * z * (1 - cosTheta)
-                )
-                return Matrix3(i, j, k)
             }
         }
     }
