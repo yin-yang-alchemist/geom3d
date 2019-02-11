@@ -2,6 +2,16 @@ import kotlin.math.*
 
 /**
  * 3x3の行列
+ * FIXME: 行と列の入れ替えを行う必要がある。
+ * [機械制御工学研究 講義ノート](http://www.st.nanzan-u.ac.jp/info/akiran/mces/mech_ctrl_eng_study_20160120.pdf)
+ * の「2.1 座標系による剛体の位置・姿勢の表現」によれば、
+ * 座標系を表す行列は各軸のベクトルを列ベクトルとして持っていて、そのまま回転行列として扱うことができる。
+ * それに対し、今の実装は計算は間違っていないが、各軸のベクトルを行ベクトルとして持つようになっている。
+ * 修正する必要があるが、i,j,kを使って計算しているところすべてに影響がある。
+ * i.x, i.y, i.z        i.x, j.x, k.x
+ * j.x, j.y, j.z    ->  i.y, j.y, k.y
+ * k.x, k.y, k.z        i.z, j.z, k.z
+ *
  * @property i      1行目を表すベクトル
  * @property j      2行目を表すベクトル
  * @property k      3行目を表すベクトル
@@ -61,7 +71,7 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
     fun isClose(other: Matrix3) = i.isClose(other.i) && j.isClose(other.j) && k.isClose(other.k)
 
     /** リストに変換する */
-    fun toList(): List<List<Double>> = listOf(i.toList(), j.toList(), k.toList())
+    fun toLists(): List<List<Double>> = listOf(i.toList(), j.toList(), k.toList())
 
     override fun toString(): String =
         listOf(i, j, k).joinToString("\n ", "[", "]")
