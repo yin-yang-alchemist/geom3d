@@ -45,8 +45,8 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
 
     /** 回転軸の計算 */
     private fun computeAxis(): Vector3 {
-        val sin_theta_half = sqrt(1 - unit.w * unit.w)
-        return Vector3(unit.x / sin_theta_half, unit.y / sin_theta_half, unit.z / sin_theta_half)
+        val sinThetaHalf = sqrt(1 - unit.w * unit.w)
+        return Vector3(unit.x / sinThetaHalf, unit.y / sinThetaHalf, unit.z / sinThetaHalf)
     }
 
     /** ２つのクォータニオンが等しいことを判定する */
@@ -93,8 +93,8 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
                 axis.isClose(Vector3.zero) -> null
                 else -> {
                     val (x, y, z) = axis.unit
-                    val sin_theta_half = sin(theta / 2)
-                    Quaternion(x * sin_theta_half, y * sin_theta_half, z * sin_theta_half, cos(theta / 2))
+                    val sinThetaHalf = sin(theta / 2)
+                    Quaternion(x * sinThetaHalf, y * sinThetaHalf, z * sinThetaHalf, cos(theta / 2))
                 }
             }
 
