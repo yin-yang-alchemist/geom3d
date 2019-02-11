@@ -93,26 +93,30 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
          * 回転軸と回転角度から回転行列を作成する。
          * [ロドリゲスの回転公式 - Wikipedia](https://ja.wikipedia.org/wiki/ロドリゲスの回転公式)
          */
-        fun createRotation(axis: Vector3, theta: Double): Matrix3 {
-            val (x, y, z) = axis.unit
-            val cosTheta = cos(theta)
-            val sinTheta = sin(theta)
-            val i = Vector3(
-                cosTheta + x * x * (1 - cosTheta),
-                x * y * (1 - cosTheta) - z * sinTheta,
-                z * x * (1 - cosTheta) + y * sinTheta
-            )
-            val j = Vector3(
-                x * y * (1 - cosTheta) + z * sinTheta,
-                cosTheta + y * y * (1 - cosTheta),
-                y * z * (1 - cosTheta) - x * sinTheta
-            )
-            val k = Vector3(
-                z * x * (1 - cosTheta) - y * sinTheta,
-                y * z * (1 - cosTheta) + x * sinTheta,
-                cosTheta + z * z * (1 - cosTheta)
-            )
-            return Matrix3(i, j, k)
+        fun createRotation(axis: Vector3, theta: Double): Matrix3? {
+            if (axis.isClose(Vector3.zero)) {
+                return null
+            } else {
+                val (x, y, z) = axis.unit
+                val cosTheta = cos(theta)
+                val sinTheta = sin(theta)
+                val i = Vector3(
+                    cosTheta + x * x * (1 - cosTheta),
+                    x * y * (1 - cosTheta) - z * sinTheta,
+                    z * x * (1 - cosTheta) + y * sinTheta
+                )
+                val j = Vector3(
+                    x * y * (1 - cosTheta) + z * sinTheta,
+                    cosTheta + y * y * (1 - cosTheta),
+                    y * z * (1 - cosTheta) - x * sinTheta
+                )
+                val k = Vector3(
+                    z * x * (1 - cosTheta) - y * sinTheta,
+                    y * z * (1 - cosTheta) + x * sinTheta,
+                    cosTheta + z * z * (1 - cosTheta)
+                )
+                return Matrix3(i, j, k)
+            }
         }
     }
 }

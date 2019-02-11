@@ -59,7 +59,7 @@ internal class Matrix3Test {
         for (count in 1..100) {
             val vec = Vector3.random()
             val mat = Matrix3.createRotation(Vector3.random(), Random.nextDouble())
-            assertTrue((mat * vec).length.isClose(vec.length))
+            if (mat != null) assertTrue((mat * vec).length.isClose(vec.length))
         }
     }
 
@@ -77,7 +77,7 @@ internal class Matrix3Test {
         for (count in 1..100) {
             val mat1 = Matrix3.createRotation(Vector3.random(), Random.nextDouble())
             val mat2 = Matrix3.createRotation(Vector3.random(), Random.nextDouble())
-            assertTrue((mat1 * mat2).isOrthogonal)
+            if (mat1 != null && mat2 != null) assertTrue((mat1 * mat2).isOrthogonal)
         }
     }
 
