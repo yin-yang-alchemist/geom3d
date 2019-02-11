@@ -1,42 +1,51 @@
 import kotlin.math.*
 import kotlin.random.Random
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.Assertions.*
 
 internal class Matrix3Test {
+
+    /** 許容値 */
+    private val TOL = 1e-9
+
+    /** Vector3をJava配列に変換する（assertArrayEqualsに渡すため） */
+    private fun Vector3.toArray() = doubleArrayOf(x, y, z)
+
+    /** Matrix3をJava配列に変換する（assertArrayEqualsに渡すため） */
+    private fun Matrix3.toArray() = doubleArrayOf(i.x, i.y, i.z, j.x, j.y, j.z, k.x, k.y, k.z)
 
     @Test
     fun getDet() {
         // 単位行列の定数倍の行列式
         for (count in 1..100) {
             val k = Random.nextDouble()
-            assertTrue((Matrix3.identity * k).det.isClose(k.pow(3)))
+            assertEquals(k.pow(3), (Matrix3.identity * k).det, TOL)
         }
         // 対角行列の行列式
         for (count in 1..100) {
             val i = Random.nextDouble()
             val j = Random.nextDouble()
             val k = Random.nextDouble()
-            assertTrue(Matrix3.createDiag(i, j, k).det.isClose((i * j * k)))
+            assertEquals(i * j * k, Matrix3.createDiag(i, j, k).det, TOL)
         }
         // 転置・逆行列の行列式
         for (count in 1..100) {
             val mat = Matrix3.random()
-            assertTrue(mat.T.det.isClose(mat.det))
+            assertEquals(mat.det, mat.T.det, TOL)
         }
         // 積の行列式
         for (count in 1..100) {
             val mat1 = Matrix3.random()
             val mat2 = Matrix3.random()
-            assertTrue((mat1 * mat2).det.isClose(mat1.det * mat2.det))
+            assertEquals(mat1.det * mat2.det, (mat1 * mat2).det, TOL)
         }
     }
 
+    @Test
     fun getT() {
         for (count in 1..100) {
             val mat = Matrix3.random()
-            assertEquals(mat, mat.T.T)
+            assertArrayEquals(mat.toArray(), mat.T.T.toArray(), TOL)
         }
     }
 
@@ -46,20 +55,20 @@ internal class Matrix3Test {
         for (count in 1..100) {
             val vec = Vector3.random()
             val k = Random.nextDouble()
-            assertEquals(vec , Matrix3.identity * vec)
-            assertEquals(vec * k, (Matrix3.identity * k) * vec)
+            assertArrayEquals(vec.toArray(), (Matrix3.identity * vec).toArray(), TOL)
+            assertArrayEquals((vec * k).toArray(), ((Matrix3.identity * k) * vec).toArray(), TOL)
         }
         // 行列をかけてさらに逆行列をかけた時に元のベクトルに戻ることをチェックする
         for (count in 1..100) {
             val vec = Vector3.random()
             val mat = Matrix3.random()
-            assertTrue((mat.inv!! * (mat * vec)).isClose(vec))
+            assertArrayEquals(vec.toArray(), (mat.inv!! * (mat * vec)).toArray(), TOL)
         }
         // 回転行列をかけて長さが変わらないことをチェックする
         for (count in 1..100) {
             val vec = Vector3.random()
             val mat = Matrix3.createRotation(Vector3.random(), Random.nextDouble())
-            if (mat != null) assertTrue((mat * vec).length.isClose(vec.length))
+            if (mat != null) assertEquals(vec.length, (mat * vec).length, TOL)
         }
     }
 
@@ -69,8 +78,8 @@ internal class Matrix3Test {
         for (count in 1..100) {
             val mat = Matrix3.random()
             if (mat.inv != null) {
-                assertTrue((mat * mat.inv!!).isClose(Matrix3.identity))
-                assertTrue((mat.inv!! * mat).isClose(Matrix3.identity))
+                assertArrayEquals(Matrix3.identity.toArray(), (mat * mat.inv!!).toArray(), TOL)
+                assertArrayEquals(Matrix3.identity.toArray(), (mat.inv!! * mat).toArray(), TOL)
             }
         }
         // 回転行列に回転行列をかけて正規直交行列になっていることをチェックする。
@@ -89,9 +98,9 @@ internal class Matrix3Test {
             assertTrue(mat.i.isUnit)
             assertTrue(mat.j.isUnit)
             assertTrue(mat.k.isUnit)
-            assertTrue((mat.i dot mat.j).isClose(0.0))
-            assertTrue((mat.j dot mat.k).isClose(0.0))
-            assertTrue((mat.k dot mat.i).isClose(0.0))
+            assertEquals(0.0, mat.i dot mat.j, TOL)
+            assertEquals(0.0, mat.j dot mat.k, TOL)
+            assertEquals(0.0, mat.k dot mat.i, TOL)
         }
     }
 
@@ -103,9 +112,9 @@ internal class Matrix3Test {
             assertTrue(mat.i.isUnit)
             assertTrue(mat.j.isUnit)
             assertTrue(mat.k.isUnit)
-            assertTrue((mat.i dot mat.j).isClose(0.0))
-            assertTrue((mat.j dot mat.k).isClose(0.0))
-            assertTrue((mat.k dot mat.i).isClose(0.0))
+            assertEquals(0.0, mat.i dot mat.j, TOL)
+            assertEquals(0.0, mat.j dot mat.k, TOL)
+            assertEquals(0.0, mat.k dot mat.i, TOL)
         }
     }
 }
