@@ -101,10 +101,9 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
         /**
          * 回転行列からクォータニオンに変換する
          * [MATLAB によるクォータニオン数値計算](http://www.mss.co.jp/technology/report/pdf/19-08.pdf)
-         * この資料とは行と列が逆になっていることに注意
          */
         fun createFromMatrix(mat: Matrix3): Quaternion? {
-            if (!mat.isOrthogonal) {
+            if (!mat.isOrthonormal) {
                 return null
             } else {
                 val q1 = sqrt(1.0 + mat.i.x - mat.j.y - mat.k.z) / 2

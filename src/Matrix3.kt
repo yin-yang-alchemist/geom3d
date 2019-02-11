@@ -9,18 +9,17 @@ import kotlin.math.*
  * @property det    行列式
  * @property T      転置行列
  * @property inv    逆行列
- * @property isOrthogonal   正規直交行列かどうかの判定
+ * @property isOrthonormal  正規直交行列かどうかの判定
  */
 data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
 
     // プロパティ
     val rows: List<Vector3> by lazy { toRows() }
-    val T: Matrix3 by lazy { transpose() }
     val det: Double by lazy { computeDeterminant() }
+    val T: Matrix3 by lazy { transpose() }
     val inv: Matrix3? by lazy { computeInverse() }
-    val isOrthogonal: Boolean by lazy { checkOrthogonal() }
+    val isOrthonormal: Boolean by lazy { checkOrthonormal() }
 
-    // 演算子のオーバーロード
     /** 演算子のオーバーロード Matrix3 + Matrix3 */
     operator fun plus(other: Matrix3) = Matrix3(i + other.i, j + other.j, k + other.k)
 
@@ -68,9 +67,9 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
     }
 
     /** 正規直交行列になっているかどうかのチェック */
-    private fun checkOrthogonal(): Boolean {
+    private fun checkOrthonormal(): Boolean {
         return i.isUnit && j.isUnit && k.isUnit
-                && (i dot j).isClose(0.0) && (j dot k).isClose(0.0 ) && (k dot i).isClose(0.0)
+                && (i dot j).isClose(0.0) && (j dot k).isClose(0.0) && (k dot i).isClose(0.0)
     }
 
     /** ２つの行列が等しいことを判定する */
