@@ -3,7 +3,7 @@ import kotlin.random.Random
 
 /**
  * 3次元ベクトル
- * @property isUnit     単位ベクトルかどうかを判定する
+ * @property isUnit     単位ベクトルかどうかの判定
  * @property length     ベクトルの長さ
  * @property unit       単位ベクトル
  */
@@ -12,7 +12,7 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
    // プロパティ
     val isUnit: Boolean by lazy { (x * x + y * y + z * z).isClose(1.0) }
     val length: Double by lazy { sqrt(x * x + y * y + z * z) }
-    val unit: Vector3 by lazy { this / this.length }
+    val unit: Vector3 by lazy { this / length }
 
     // 演算子のオーバーロード
     operator fun unaryMinus() = Vector3(-x, -y, -z)
@@ -21,13 +21,9 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
     operator fun minus(other: Vector3) = Vector3(x - other.x, y - other.y, z - other.z)
     operator fun times(scalar: Double) = Vector3(scalar * x, scalar * y, scalar * z)
     operator fun div(k: Double) = Vector3(x / k, y / k, z / k)
-    override fun equals(other: Any?): Boolean {
-        other as Vector3
-        return x == other.x && y == other.y && z == other.z
-    }
 
     /** 内積 */
-    infix fun dot(other: Vector3) = x * other.x + y * other.y + z * other.z
+    infix fun dot(other: Vector3) = this.x * other.x + this.y * other.y + this.z * other.z
 
     /** クロス積 */
     infix fun cross(other: Vector3) =
