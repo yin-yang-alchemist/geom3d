@@ -12,7 +12,7 @@ internal class Matrix3Test {
     private fun Vector3.toArray() = doubleArrayOf(x, y, z)
 
     /** Matrix3をJava配列に変換する（assertArrayEqualsに渡すため） */
-    private fun Matrix3.toArray() = doubleArrayOf(i.x, i.y, i.z, j.x, j.y, j.z, k.x, k.y, k.z)
+    private fun Matrix3.toArray() = doubleArrayOf(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z)
 
     @Test
     fun getDet() {
@@ -46,6 +46,17 @@ internal class Matrix3Test {
         for (count in 1..100) {
             val mat = Matrix3.random()
             assertArrayEquals(mat.toArray(), mat.T.T.toArray(), TOL)
+        }
+    }
+
+    @Test
+    fun getInv() {
+        // 行列に逆行列をかけると単位行列になることをチェックする
+        for (count in 1..100) {
+            val mat = Matrix3(Vector3.random(), Vector3.random(), Vector3.random())
+            if (mat.inv != null) {
+                assertArrayEquals(Matrix3.identity.toArray(), (mat * mat.inv!!).toArray(), TOL)
+            }
         }
     }
 
@@ -106,15 +117,37 @@ internal class Matrix3Test {
 
     @Test
     fun createRotation() {
+        // 各軸周り60度回転の回転行列が正しいことをチェックする。
+        val rad = PI / 3
+        val mat_x60deg = Matrix3.createRotation(Vector3.unitX, rad)!!
+        assertArrayEquals(
+            mat_x60deg.toArray(),
+            Matrix3(Vector3.unitX, Vector3(0.0, cos(rad), sin(rad)), Vector3(0.0,-sin(rad), cos(rad))).toArray(),
+            TOL
+        )
+        val mat_y60deg = Matrix3.createRotation(Vector3.unitY, rad)!!
+        assertArrayEquals(
+            mat_y60deg.toArray(),
+            Matrix3(Vector3(cos(rad), 0.0, -sin(rad)), Vector3.unitY, Vector3(sin(rad),0.0, cos(rad))).toArray(),
+            TOL
+        )
+        val mat_z60deg = Matrix3.createRotation(Vector3.unitZ, rad)!!
+        assertArrayEquals(
+            mat_z60deg.toArray(),
+            Matrix3(Vector3(cos(rad), sin(rad), 0.0), Vector3(-sin(rad), cos(rad), 0.0), Vector3.unitZ).toArray(),
+            TOL
+        )
         // 各行が単位ベクトルで全て直交していることをチェックする。
         for (count in 1..100) {
-            val mat = Matrix3.createCsys(Vector3.random(), Vector3.random())
-            assertTrue(mat.i.isUnit)
-            assertTrue(mat.j.isUnit)
-            assertTrue(mat.k.isUnit)
-            assertEquals(0.0, mat.i dot mat.j, TOL)
-            assertEquals(0.0, mat.j dot mat.k, TOL)
-            assertEquals(0.0, mat.k dot mat.i, TOL)
+            val mat = Matrix3.createRotation(Vector3.random(), Random.nextDouble())
+            if (mat != null) {
+                assertTrue(mat.i.isUnit)
+                assertTrue(mat.j.isUnit)
+                assertTrue(mat.k.isUnit)
+                assertEquals(0.0, mat.i dot mat.j, TOL)
+                assertEquals(0.0, mat.j dot mat.k, TOL)
+                assertEquals(0.0, mat.k dot mat.i, TOL)
+            }
         }
     }
 }

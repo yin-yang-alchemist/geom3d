@@ -12,7 +12,7 @@ internal class QuaternionTest {
     private fun Vector3.toArray() = doubleArrayOf(x, y, z)
 
     /** Matrix3をJava配列に変換する（assertArrayEqualsに渡すため） */
-    private fun Matrix3.toArray() = doubleArrayOf(i.x, i.y, i.z, j.x, j.y, j.z, k.x, k.y, k.z)
+    private fun Matrix3.toArray() = doubleArrayOf(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z)
 
     /** QuaternionをJava配列に変換する（assertArrayEqualsに渡すため） */
     private fun Quaternion.toArray() = doubleArrayOf(x, y, z, w)

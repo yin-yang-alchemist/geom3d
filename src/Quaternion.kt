@@ -60,9 +60,9 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
     fun toMatrix(): Matrix3 {
         val (x, y, z, w) = this.unit
         return Matrix3(
-            Vector3(x * x - y * y - z * z + w * w, 2 * (x * y - z * w), 2 * (x * z + y * w)),
-            Vector3(2 * (x * y + z * w), -x * x + y * y - z * z + w * w, 2 * (y * z - x * w)),
-            Vector3(2 * (x * z - y * w), 2 * (y * z + x * w), -x * x - y * y + z * z + w * w)
+            Vector3(x * x - y * y - z * z + w * w, 2 * (x * y + z * w), 2 * (x * z - y * w)),
+            Vector3(2 * (x * y - z * w), -x * x + y * y - z * z + w * w, 2 * (y * z + x * w)),
+            Vector3(2 * (x * z + y * w), 2 * (y * z - x * w), -x * x - y * y + z * z + w * w)
         )
     }
 
@@ -115,26 +115,26 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
                 return when (maxIndex) {
                     0 -> Quaternion(
                         q1,
-                        (mat.j.x + mat.i.y) / (4 * q1),
-                        (mat.k.x + mat.i.z) / (4 * q1),
-                        (mat.k.y - mat.j.z) / (4 * q1)
+                        (mat.i.y + mat.j.x) / (4 * q1),
+                        (mat.i.z + mat.k.x) / (4 * q1),
+                        (mat.j.z - mat.k.y) / (4 * q1)
                     )
                     1 -> Quaternion(
-                        (mat.j.x + mat.i.y) / (4 * q2),
+                        (mat.i.y + mat.j.x) / (4 * q2),
                         q2,
-                        (mat.j.z + mat.k.y) / (4 * q2),
-                        (mat.i.z - mat.k.x) / (4 * q2)
+                        (mat.k.y + mat.j.z) / (4 * q2),
+                        (mat.k.x - mat.i.z) / (4 * q2)
                     )
                     2 -> Quaternion(
-                        (mat.i.z + mat.k.x) / (4 * q3),
-                        (mat.j.z + mat.k.y) / (4 * q3),
+                        (mat.k.x + mat.i.z) / (4 * q3),
+                        (mat.k.y + mat.j.z) / (4 * q3),
                         q3,
-                        (mat.j.x - mat.i.y) / (4 * q3)
+                        (mat.i.y - mat.j.x) / (4 * q3)
                     )
                     else -> Quaternion(
-                        (mat.k.y - mat.j.z) / (4 * q4),
-                        (mat.i.z - mat.k.x) / (4 * q4),
-                        (mat.j.x - mat.i.y) / (4 * q4),
+                        (mat.j.z - mat.k.y) / (4 * q4),
+                        (mat.k.x - mat.i.z) / (4 * q4),
+                        (mat.i.y - mat.j.x) / (4 * q4),
                         q4
                     )
                 }

@@ -2,53 +2,59 @@ import kotlin.math.*
 
 /**
  * 3x3の行列
- * FIXME: 行と列の入れ替えを行う必要がある。
- * [機械制御工学研究 講義ノート](http://www.st.nanzan-u.ac.jp/info/akiran/mces/mech_ctrl_eng_study_20160120.pdf)
- * の「2.1 座標系による剛体の位置・姿勢の表現」によれば、
- * 座標系を表す行列は各軸のベクトルを列ベクトルとして持っていて、そのまま回転行列として扱うことができる。
- * それに対し、今の実装は計算は間違っていないが、各軸のベクトルを行ベクトルとして持つようになっている。
- * 修正する必要があるが、i,j,kを使って計算しているところすべてに影響がある。
- * i.x, i.y, i.z        i.x, j.x, k.x
- * j.x, j.y, j.z    ->  i.y, j.y, k.y
- * k.x, k.y, k.z        i.z, j.z, k.z
- *
- * @property i      1行目を表すベクトル
- * @property j      2行目を表すベクトル
- * @property k      3行目を表すベクトル
- * @property T      転置行列
+ * @property i      1列目を表すベクトル
+ * @property j      2列目を表すベクトル
+ * @property k      3列目を表すベクトル
+ * @property rows   3つの行を表すベクトル
  * @property det    行列式
+ * @property T      転置行列
  * @property inv    逆行列
  * @property isOrthogonal   正規直交行列かどうかの判定
  */
 data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
 
     // プロパティ
+    val rows: List<Vector3> by lazy { toRows() }
     val T: Matrix3 by lazy { transpose() }
     val det: Double by lazy { computeDeterminant() }
     val inv: Matrix3? by lazy { computeInverse() }
     val isOrthogonal: Boolean by lazy { checkOrthogonal() }
 
     // 演算子のオーバーロード
+    /** 演算子のオーバーロード Matrix3 + Matrix3 */
     operator fun plus(other: Matrix3) = Matrix3(i + other.i, j + other.j, k + other.k)
 
+    /** 演算子のオーバーロード Matrix3 - Matrix3 */
     operator fun minus(other: Matrix3) = Matrix3(i - other.i, j - other.j, k - other.k)
+
+    /** 演算子のオーバーロード Matrix3 * Double */
     operator fun times(scalar: Double) = Matrix3(i * scalar, j * scalar, k * scalar)
-    operator fun times(vec: Vector3) = Vector3(i dot vec, j dot vec, k dot vec)
+
+    /** 演算子のオーバーロード Matrix3 * Vector3 */
+    operator fun times(vec: Vector3): Vector3 {
+        val (row1, row2, row3) = this.rows
+        return Vector3(row1 dot vec, row2 dot vec, row3 dot vec)
+    }
+
+    /** 演算子のオーバーロード Matrix3 * Matrix3 */
     operator fun times(other: Matrix3): Matrix3 {
-        val (col1, col2, col3) = other.transpose()
+        val (row1, row2, row3) = this.rows
         return Matrix3(
-            Vector3(i dot col1, i dot col2, i dot col3),
-            Vector3(j dot col1, j dot col2, j dot col3),
-            Vector3(k dot col1, k dot col2, k dot col3)
+            Vector3(row1 dot other.i, row1 dot other.j, row1 dot other.k),
+            Vector3(row2 dot other.i, row2 dot other.j, row2 dot other.k),
+            Vector3(row3 dot other.i, row3 dot other.j, row3 dot other.k)
         )
     }
+
+    /** 行を取得 */
+    private fun toRows() = listOf(Vector3(i.x, j.x, k.x), Vector3(i.y, j.y, k.y), Vector3(i.z, j.z, k.z))
 
     /** 転置行列の計算 */
     private fun transpose() = Matrix3(Vector3(i.x, j.x, k.x), Vector3(i.y, j.y, k.y), Vector3(i.z, j.z, k.z))
 
     /** 行列式の計算 */
     private fun computeDeterminant(): Double =
-        i.x * j.y * k.z + i.y * j.z * k.x + i.z * j.x * k.y - i.z * j.y * k.x - i.x * j.z * k.y - i.y * j.x * k.z
+        i.x * j.y * k.z + j.x * k.y * i.z + k.x * i.y * j.z - k.x * j.y * i.z - i.x * k.y * j.z - j.x * i.y * k.z
 
     /** 逆行列の計算 */
     private fun computeInverse(): Matrix3? = when {
@@ -70,11 +76,8 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
     /** ２つの行列が等しいことを判定する */
     fun isClose(other: Matrix3) = i.isClose(other.i) && j.isClose(other.j) && k.isClose(other.k)
 
-    /** リストに変換する */
-    fun toLists(): List<List<Double>> = listOf(i.toList(), j.toList(), k.toList())
-
-    override fun toString(): String =
-        listOf(i, j, k).joinToString("\n ", "[", "]")
+    /** 表示用の文字列に変換 */
+    override fun toString(): String = rows.joinToString("\n ", "[", "]")
 
     /**
      * 行列の生成に使う機能
@@ -112,17 +115,17 @@ data class Matrix3(val i: Vector3, val j: Vector3, val k: Vector3) {
                 val sinTheta = sin(theta)
                 val i = Vector3(
                     cosTheta + x * x * (1 - cosTheta),
-                    x * y * (1 - cosTheta) - z * sinTheta,
-                    z * x * (1 - cosTheta) + y * sinTheta
+                    x * y * (1 - cosTheta) + z * sinTheta,
+                    z * x * (1 - cosTheta) - y * sinTheta
                 )
                 val j = Vector3(
-                    x * y * (1 - cosTheta) + z * sinTheta,
+                    x * y * (1 - cosTheta) - z * sinTheta,
                     cosTheta + y * y * (1 - cosTheta),
-                    y * z * (1 - cosTheta) - x * sinTheta
+                    y * z * (1 - cosTheta) + x * sinTheta
                 )
                 val k = Vector3(
-                    z * x * (1 - cosTheta) - y * sinTheta,
-                    y * z * (1 - cosTheta) + x * sinTheta,
+                    z * x * (1 - cosTheta) + y * sinTheta,
+                    y * z * (1 - cosTheta) - x * sinTheta,
                     cosTheta + z * z * (1 - cosTheta)
                 )
                 return Matrix3(i, j, k)
