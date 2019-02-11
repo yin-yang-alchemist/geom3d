@@ -25,15 +25,21 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
 
     constructor(vec: Vector3, w: Double) : this(vec.x, vec.y, vec.z, w)
 
-    // 演算子のオーバーロード
+    /** 演算子のオーバーロード Quaternion * Double */
     operator fun times(k: Double) = Quaternion(k * x, k * y, k * z, k * w)
+
+    /** 演算子のオーバーロード Quaternion / Double */
     operator fun div(k: Double) = Quaternion(x / k, y / k, z / k, w / k)
+
+    /** 演算子のオーバーロード Quaternion * Quaternion */
     operator fun times(other: Quaternion): Quaternion {
-        val vec1 = Vector3(this.x, this.y, this.z)
-        val vec2 = Vector3(other.x, other.y, other.z)
+        val (x1, y1, z1, w1) = this
+        val (x2, y2, z2, w2) = other
         return Quaternion(
-            vec1 cross vec2 + vec1 * other.w + vec2 * this.w,
-            this.w * other.w - (vec1 dot vec2)
+            w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+            w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+            w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+            w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
         )
     }
 
@@ -43,20 +49,34 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
         return Vector3(unit.x / sin_theta_half, unit.y / sin_theta_half, unit.z / sin_theta_half)
     }
 
+    /** ２つのクォータニオンが等しいことを判定する */
+    fun isClose(other: Quaternion) =
+        x.isClose(other.x) && y.isClose(other.y) && z.isClose(other.z) && w.isClose(other.w)
+
+    /** ２つのクォータニオンが等価であることを判定する */
+    fun isEquivalent(other: Quaternion) = this.isClose(other) || this.isClose(other * (-1.0))
+
     /** 回転行列に変換する */
     fun toMatrix(): Matrix3 {
         val (x, y, z, w) = this.unit
         return Matrix3(
             Vector3(x * x - y * y - z * z + w * w, 2 * (x * y - z * w), 2 * (x * z + y * w)),
             Vector3(2 * (x * y + z * w), -x * x + y * y - z * z + w * w, 2 * (y * z - x * w)),
-            Vector3(2 * (x * z - y * x), 2 * (x * y + z * w), -x * x - y * y + z * z + w * w)
+            Vector3(2 * (x * z - y * w), 2 * (y * z + x * w), -x * x - y * y + z * z + w * w)
         )
     }
+
+    /** リストに変換する */
+    fun toList() = listOf(x, y, z, w)
+
+    override fun toString(): String = "[%7.4f, %7.4f, %7.4f, %7.4f]".format(x, y, z, w)
 
     /**
      * クォータニオンの生成に使う機能
      */
     companion object {
+        val identity = Quaternion(0.0, 0.0, 0.0, 1.0)
+
         /**
          * 単位クォータニオンを作成する。
          */
@@ -81,6 +101,7 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
         /**
          * 回転行列からクォータニオンに変換する
          * [MATLAB によるクォータニオン数値計算](http://www.mss.co.jp/technology/report/pdf/19-08.pdf)
+         * この資料とは行と列が逆になっていることに注意
          */
         fun createFromMatrix(mat: Matrix3): Quaternion? {
             if (!mat.isOrthogonal) {
@@ -94,26 +115,26 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
                 return when (maxIndex) {
                     0 -> Quaternion(
                         q1,
-                        (mat.i.y + mat.j.x) / (4 * q1),
-                        (mat.i.z + mat.k.x) / (4 * q1),
-                        (mat.j.z - mat.k.y) / (4 * q1)
+                        (mat.j.x + mat.i.y) / (4 * q1),
+                        (mat.k.x + mat.i.z) / (4 * q1),
+                        (mat.k.y - mat.j.z) / (4 * q1)
                     )
                     1 -> Quaternion(
-                        (mat.i.y + mat.j.x) / (4 * q2),
+                        (mat.j.x + mat.i.y) / (4 * q2),
                         q2,
-                        (mat.k.y + mat.j.z) / (4 * q2),
-                        (mat.k.x - mat.i.z) / (4 * q2)
+                        (mat.j.z + mat.k.y) / (4 * q2),
+                        (mat.i.z - mat.k.x) / (4 * q2)
                     )
                     2 -> Quaternion(
-                        (mat.k.x + mat.i.z) / (4 * q3),
-                        (mat.k.y + mat.j.z) / (4 * q3),
+                        (mat.i.z + mat.k.x) / (4 * q3),
+                        (mat.j.z + mat.k.y) / (4 * q3),
                         q3,
-                        (mat.i.y - mat.j.x) / (4 * q3)
+                        (mat.j.x - mat.i.y) / (4 * q3)
                     )
                     else -> Quaternion(
-                        (mat.j.z - mat.k.y) / (4 * q4),
-                        (mat.k.x - mat.i.z) / (4 * q4),
-                        (mat.i.y - mat.j.x) / (4 * q4),
+                        (mat.k.y - mat.j.z) / (4 * q4),
+                        (mat.i.z - mat.k.x) / (4 * q4),
+                        (mat.j.x - mat.i.y) / (4 * q4),
                         q4
                     )
                 }
@@ -121,4 +142,3 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
         }
     }
 }
-
