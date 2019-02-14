@@ -12,7 +12,7 @@ internal class Matrix3Test {
     private fun Vector3.toArray() = doubleArrayOf(x, y, z)
 
     /** Matrix3をJava配列に変換する（assertArrayEqualsに渡すため） */
-    private fun Matrix3.toArray() = doubleArrayOf(i.x, j.x, k.x, i.y, j.y, k.y, i.z, j.z, k.z)
+    private fun Matrix3.toArray() = doubleArrayOf(m11, m12, m13, m21, m22, m23, m31, m32, m33)
 
     @Test
     fun getDet() {
@@ -53,7 +53,7 @@ internal class Matrix3Test {
     fun getInv() {
         // 行列に逆行列をかけると単位行列になることをチェックする
         for (count in 1..100) {
-            val mat = Matrix3(Vector3.random(), Vector3.random(), Vector3.random())
+            val mat = Matrix3.random()
             if (mat.inv != null) {
                 assertArrayEquals(Matrix3.identity.toArray(), (mat * mat.inv!!).toArray(), TOL)
             }
@@ -106,12 +106,13 @@ internal class Matrix3Test {
         // 各行が単位ベクトルで全て直交していることをチェックする。
         for (count in 1..100) {
             val mat = Matrix3.createCsys(Vector3.random(), Vector3.random())
-            assertTrue(mat.i.isUnit)
-            assertTrue(mat.j.isUnit)
-            assertTrue(mat.k.isUnit)
-            assertEquals(0.0, mat.i dot mat.j, TOL)
-            assertEquals(0.0, mat.j dot mat.k, TOL)
-            assertEquals(0.0, mat.k dot mat.i, TOL)
+            val (i, j, k) = mat.cols
+            assertTrue(i.isUnit)
+            assertTrue(j.isUnit)
+            assertTrue(k.isUnit)
+            assertEquals(0.0, i dot j, TOL)
+            assertEquals(0.0, j dot k, TOL)
+            assertEquals(0.0, k dot i, TOL)
         }
     }
 
@@ -122,31 +123,32 @@ internal class Matrix3Test {
         val mat_x60deg = Matrix3.createRotation(Vector3.unitX, rad)!!
         assertArrayEquals(
             mat_x60deg.toArray(),
-            Matrix3(Vector3.unitX, Vector3(0.0, cos(rad), sin(rad)), Vector3(0.0,-sin(rad), cos(rad))).toArray(),
+            Matrix3.ofCols(Vector3.unitX, Vector3(0.0, cos(rad), sin(rad)), Vector3(0.0,-sin(rad), cos(rad))).toArray(),
             TOL
         )
         val mat_y60deg = Matrix3.createRotation(Vector3.unitY, rad)!!
         assertArrayEquals(
             mat_y60deg.toArray(),
-            Matrix3(Vector3(cos(rad), 0.0, -sin(rad)), Vector3.unitY, Vector3(sin(rad),0.0, cos(rad))).toArray(),
+            Matrix3.ofCols(Vector3(cos(rad), 0.0, -sin(rad)), Vector3.unitY, Vector3(sin(rad),0.0, cos(rad))).toArray(),
             TOL
         )
         val mat_z60deg = Matrix3.createRotation(Vector3.unitZ, rad)!!
         assertArrayEquals(
             mat_z60deg.toArray(),
-            Matrix3(Vector3(cos(rad), sin(rad), 0.0), Vector3(-sin(rad), cos(rad), 0.0), Vector3.unitZ).toArray(),
+            Matrix3.ofCols(Vector3(cos(rad), sin(rad), 0.0), Vector3(-sin(rad), cos(rad), 0.0), Vector3.unitZ).toArray(),
             TOL
         )
         // 各行が単位ベクトルで全て直交していることをチェックする。
         for (count in 1..100) {
             val mat = Matrix3.createRotation(Vector3.random(), Random.nextDouble())
             if (mat != null) {
-                assertTrue(mat.i.isUnit)
-                assertTrue(mat.j.isUnit)
-                assertTrue(mat.k.isUnit)
-                assertEquals(0.0, mat.i dot mat.j, TOL)
-                assertEquals(0.0, mat.j dot mat.k, TOL)
-                assertEquals(0.0, mat.k dot mat.i, TOL)
+                val (i, j, k) = mat.cols
+                assertTrue(i.isUnit)
+                assertTrue(j.isUnit)
+                assertTrue(k.isUnit)
+                assertEquals(0.0, i dot j, TOL)
+                assertEquals(0.0, j dot k, TOL)
+                assertEquals(0.0, k dot i, TOL)
             }
         }
     }
