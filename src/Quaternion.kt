@@ -104,7 +104,7 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
          * [MATLAB によるクォータニオン数値計算](http://www.mss.co.jp/technology/report/pdf/19-08.pdf)
          */
         fun createFromMatrix(mat: Matrix3): Quaternion? {
-            if (!mat.isOrthonormal) {
+            if (mat.isOrthonormal != true) {
                 return null
             } else {
                 val q1 = sqrt(1.0 + mat.m11 - mat.m22 - mat.m33) / 2
