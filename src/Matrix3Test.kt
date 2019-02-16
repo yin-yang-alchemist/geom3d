@@ -102,6 +102,28 @@ internal class Matrix3Test {
     }
 
     @Test
+    fun createScale() {
+        // XYZ軸方向のスケーリング行列が正しいことをチェックする。
+        for (count in 1..100) {
+            val scale = Random.nextDouble()
+            val matX = Matrix3.createScale(Vector3.unitX, scale)
+            val matY = Matrix3.createScale(Vector3.unitY, scale)
+            val matZ = Matrix3.createScale(Vector3.unitZ, scale)
+            assertArrayEquals(matX.toArray(), Matrix3.createDiag(scale, 1.0, 1.0).toArray(), TOL)
+            assertArrayEquals(matY.toArray(), Matrix3.createDiag(1.0, scale, 1.0).toArray(), TOL)
+            assertArrayEquals(matZ.toArray(), Matrix3.createDiag(1.0, 1.0, scale).toArray(), TOL)
+        }
+        // スケーリング方向に平行なベクトルが定数倍になることをチェックする。
+        for (count in 1..100) {
+            val scale = Random.nextDouble()
+            val axis = Vector3.random()
+            val mat = Matrix3.createScale(axis, scale)
+            val vec = axis * 2.0
+            assertArrayEquals((mat * vec).toArray(), (vec * scale).toArray(), TOL)
+        }
+    }
+
+    @Test
     fun createCsys() {
         // 各行が単位ベクトルで全て直交していることをチェックする。
         for (count in 1..100) {

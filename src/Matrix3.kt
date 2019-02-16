@@ -168,8 +168,16 @@ data class Matrix3(
             )
 
         /**
-         * TODO: スケーリングを表す行列を作成する。
+         * スケーリングを表す行列を作成する。
          */
+        fun createScale(axis: Vector3, scale: Double): Matrix3 {
+            val (x, y, z) = axis.unit
+            return Matrix3(
+                1 + (scale - 1) * x * x, (scale - 1) * x * y, (scale - 1) * z * x,
+                (scale - 1) * x * y, 1 + (scale - 1) * y * y, (scale - 1) * y * z,
+                (scale - 1) * z * x, (scale - 1) * y * z, 1 + (scale - 1) * z * z
+            )
+        }
 
         /**
          * 座標系を表す行列を作成する。
