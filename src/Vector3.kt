@@ -14,8 +14,7 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
     val isUnit: Boolean by lazy { (x * x + y * y + z * z).isClose(1.0) }
     val isFinite: Boolean by lazy { (x * x + y * y + z * z).isFinite() }
     val length: Double by lazy { sqrt(x * x + y * y + z * z) }
-    // TODO: 単位ベクトルの場合は自身を返すように変更する。
-    val unit: Vector3 by lazy { this / length }
+    val unit: Vector3 by lazy { if (isUnit) this else this / length }
 
     /** 演算子のオーバーロード -Vector3 */
     operator fun unaryMinus() = Vector3(-x, -y, -z)
