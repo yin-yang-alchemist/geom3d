@@ -1,5 +1,3 @@
-import kotlin.math.*
-
 /**
  * 4x4の同次変換行列
  * @property rot    回転行列
@@ -85,8 +83,9 @@ data class Matrix4(val rot: Matrix3, val trans: Vector3) {
         fun createMirror(axis: Vector3, center: Vector3 = Vector3.zero) = createScale(axis, -1.0, center)
 
         /**
-         * TODO: 原点を持つ座標系を表す行列を作成する。
+         * 原点を持つ座標系を表す行列を作成する。
          */
+        fun createCsys(i: Vector3, j: Vector3, origin: Vector3 = Vector3.zero) = Matrix4(Matrix3.createCsys(i, j), origin)
 
         /**
          * 回転を表す行列を作成する。
@@ -100,7 +99,13 @@ data class Matrix4(val rot: Matrix3, val trans: Vector3) {
         }
 
         /**
-         * TODO: 座標系から座標系へ移動する行列を作成する。
+         * 座標系から座標系への移動を表す行列を作成する。
          */
+        fun createMove(startCsys: Matrix4, endCsys: Matrix4): Matrix4? {
+            return when {
+                startCsys.inv == null -> null
+                else -> endCsys * startCsys.inv!!
+            }
+        }
     }
 }
