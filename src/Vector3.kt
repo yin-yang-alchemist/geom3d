@@ -4,6 +4,7 @@ import kotlin.random.Random
 /**
  * 3次元ベクトル
  * @property isUnit     単位ベクトルかどうかの判定
+ * @property isFinite   有効な値かどうかの判定
  * @property length     ベクトルの長さ
  * @property unit       単位ベクトル
  */
@@ -11,8 +12,8 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
 
    // プロパティ
     val isUnit: Boolean by lazy { (x * x + y * y + z * z).isClose(1.0) }
+    val isFinite: Boolean by lazy { (x * x + y * y + z * z).isFinite() }
     val length: Double by lazy { sqrt(x * x + y * y + z * z) }
-    // TODO: length=0の時はunit=nullになるようにする。あるいは使うときに有効な値かチェックしやすくする。
     val unit: Vector3 by lazy { this / length }
 
     // 演算子のオーバーロード
@@ -49,6 +50,7 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
     /** リストに変換する */
     fun toList() = listOf(x, y, z)
 
+    /** 表示用の文字列に変換 */
     override fun toString(): String = "[%7.4f, %7.4f, %7.4f]".format(x, y, z)
 
     /**
