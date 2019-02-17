@@ -24,6 +24,7 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
     val angle: Double by lazy { acos(unit.w) * 2 }
     val axis: Vector3 by lazy { computeAxis() }
 
+    /** セカンダリコンストラクタ */
     constructor(vec: Vector3, w: Double) : this(vec.x, vec.y, vec.z, w)
 
     /** 演算子のオーバーロード Quaternion * Double */
@@ -70,12 +71,14 @@ data class Quaternion(val x: Double, val y: Double, val z: Double, val w: Double
     /** リストに変換する */
     fun toList() = listOf(x, y, z, w)
 
+    /** 表示用の文字列に変換 */
     override fun toString(): String = "[%7.4f, %7.4f, %7.4f, %7.4f]".format(x, y, z, w)
 
     /**
      * クォータニオンの生成に使う機能
      */
     companion object {
+        /** 無回転を表すクォータニオン */
         val identity = Quaternion(0.0, 0.0, 0.0, 1.0)
 
         /**

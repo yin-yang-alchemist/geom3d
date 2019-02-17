@@ -16,7 +16,6 @@ data class Matrix3(
 ) {
 
     // プロパティ
-
     val cols: List<Vector3> by lazy { toCols() }
     val rows: List<Vector3> by lazy { toRows() }
     val det: Double by lazy { computeDeterminant() }
@@ -154,7 +153,7 @@ data class Matrix3(
                 col1.z, col2.z, col3.z
             )
 
-        /** ランダムな行列を作成する */
+        /** -1.0~1.0の成分を持つランダムな行列を作成する */
         fun random() = Matrix3.ofRows(Vector3.random(), Vector3.random(), Vector3.random())
 
         /**

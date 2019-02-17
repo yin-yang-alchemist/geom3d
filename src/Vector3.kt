@@ -14,14 +14,22 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
     val isUnit: Boolean by lazy { (x * x + y * y + z * z).isClose(1.0) }
     val isFinite: Boolean by lazy { (x * x + y * y + z * z).isFinite() }
     val length: Double by lazy { sqrt(x * x + y * y + z * z) }
+    // TODO: 単位ベクトルの場合は自身を返すように変更する。
     val unit: Vector3 by lazy { this / length }
 
-    // 演算子のオーバーロード
+    /** 演算子のオーバーロード -Vector3 */
     operator fun unaryMinus() = Vector3(-x, -y, -z)
 
+    /** 演算子のオーバーロード Vector3 + Vector3 */
     operator fun plus(other: Vector3) = Vector3(x + other.x, y + other.y, z + other.z)
+
+    /** 演算子のオーバーロード Vector3 - Vector3 */
     operator fun minus(other: Vector3) = Vector3(x - other.x, y - other.y, z - other.z)
+
+    /** 演算子のオーバーロード Vector3 * Double */
     operator fun times(scalar: Double) = Vector3(scalar * x, scalar * y, scalar * z)
+
+    /** 演算子のオーバーロード Vector3 / Double */
     operator fun div(k: Double) = Vector3(x / k, y / k, z / k)
 
     /** 内積 */
@@ -64,6 +72,8 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
         val unitX = Vector3(1.0, 0.0, 0.0)
         val unitY = Vector3(0.0, 1.0, 0.0)
         val unitZ = Vector3(0.0, 0.0, 1.0)
+
+        /** -1.0~1.0の成分を持つランダムなベクトルを作成する */
         fun random() = Vector3(1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble(), 1 - 2 * Random.nextDouble())
     }
 }

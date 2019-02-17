@@ -11,7 +11,6 @@ import kotlin.math.*
 data class Matrix4(val rot: Matrix3, val trans: Vector3) {
 
     // プロパティ
-
     val cols: List<List<Double>> by lazy { toCols() }
     val rows: List<List<Double>> by lazy { toRows() }
     val inv: Matrix4? by lazy { computeInverse() }
