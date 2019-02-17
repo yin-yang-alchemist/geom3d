@@ -97,7 +97,7 @@ internal class Matrix3Test {
         for (count in 1..100) {
             val mat1 = Matrix3.createRotation(Vector3.random(), Random.nextDouble())
             val mat2 = Matrix3.createRotation(Vector3.random(), Random.nextDouble())
-            if (mat1 != null && mat2 != null) assertTrue((mat1 * mat2).isOrthonormal!!)
+            if (mat1 != null && mat2 != null) assertTrue((mat1 * mat2).isOrthogonal!!)
         }
     }
 

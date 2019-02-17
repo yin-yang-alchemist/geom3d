@@ -7,7 +7,7 @@ import kotlin.math.*
  * @property det    行列式
  * @property T      転置行列
  * @property inv    逆行列
- * @property isOrthonormal  正規直交行列かどうかの判定
+ * @property isOrthogonal   直交行列かどうかの判定
  */
 data class Matrix3(
     val m11: Double, val m12: Double, val m13: Double,
@@ -20,8 +20,8 @@ data class Matrix3(
     val rows: List<Vector3> by lazy { toRows() }
     val det: Double by lazy { computeDeterminant() }
     val T: Matrix3 by lazy { transpose() }
-    val inv: Matrix3? by lazy { if (isOrthonormal == true) T else computeInverse() }
-    var isOrthonormal: Boolean? = null
+    val inv: Matrix3? by lazy { if (isOrthogonal == true) T else computeInverse() }
+    var isOrthogonal: Boolean? = null
         get() {
             if (field == null) field = checkOrthonormal()
             return field
@@ -63,15 +63,15 @@ data class Matrix3(
         val (row1, row2, row3) = this.toRows()
         val (col1, col2, col3) = other.toCols()
         val productIsOrthonormal = when {
-            this.isOrthonormal == null -> null
-            other.isOrthonormal == null -> null
-            else -> this.isOrthonormal!! && other.isOrthonormal!!
+            this.isOrthogonal == null -> null
+            other.isOrthogonal == null -> null
+            else -> this.isOrthogonal!! && other.isOrthogonal!!
         }
         return Matrix3(
             row1 dot col1, row1 dot col2, row1 dot col3,
             row2 dot col1, row2 dot col2, row2 dot col3,
             row3 dot col1, row3 dot col2, row3 dot col3
-        ).apply { isOrthonormal = productIsOrthonormal }
+        ).apply { isOrthogonal = productIsOrthonormal }
     }
 
     /** 行を取得 */
@@ -86,7 +86,7 @@ data class Matrix3(
             m11, m21, m31,
             m12, m22, m32,
             m13, m23, m33
-        ).also { it.isOrthonormal = this.isOrthonormal }
+        ).also { it.isOrthogonal = this.isOrthogonal }
 
     /** 行列式の計算 */
     private fun computeDeterminant(): Double =
@@ -128,14 +128,14 @@ data class Matrix3(
             0.0, 0.0, 0.0,
             0.0, 0.0, 0.0,
             0.0, 0.0, 0.0
-        ).apply { isOrthonormal = false }
+        ).apply { isOrthogonal = false }
 
         /** 単位行列 */
         val identity = Matrix3(
             1.0, 0.0, 0.0,
             0.0, 1.0, 0.0,
             0.0, 0.0, 1.0
-        ).apply { isOrthonormal = true }
+        ).apply { isOrthogonal = true }
 
         /** ３つの行から行列を作成する */
         fun ofRows(row1: Vector3, row2: Vector3, row3: Vector3) =
@@ -184,7 +184,7 @@ data class Matrix3(
         fun createCsys(i: Vector3, j: Vector3): Matrix3 {
             val jOrtho = j - i.unit * (i.unit dot j)    // iに垂直になるように修正したj
             val k = i.unit cross jOrtho.unit
-            return Matrix3.ofCols(i.unit, jOrtho.unit, k).apply { isOrthonormal = true }
+            return Matrix3.ofCols(i.unit, jOrtho.unit, k).apply { isOrthogonal = true }
         }
 
         /**
@@ -202,7 +202,7 @@ data class Matrix3(
                     cos_ + x * x * (1 - cos_), x * y * (1 - cos_) - z * sin_, z * x * (1 - cos_) + y * sin_,
                     x * y * (1 - cos_) + z * sin_, cos_ + y * y * (1 - cos_), y * z * (1 - cos_) - x * sin_,
                     z * x * (1 - cos_) - y * sin_, y * z * (1 - cos_) + x * sin_, cos_ + z * z * (1 - cos_)
-                ).apply { isOrthonormal = true }
+                ).apply { isOrthogonal = true }
             }
         }
     }
