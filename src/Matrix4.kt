@@ -1,3 +1,5 @@
+import kotlin.math.*
+
 /**
  * 4x4の同次変換行列
  * @property rot    回転行列
@@ -45,10 +47,18 @@ data class Matrix4(val rot: Matrix3, val trans: Vector3) {
     fun transform(vec: Vector3): Vector3 = rot * vec + trans
 
     /** 表示用の文字列に変換 */
-    override fun toString(): String =
-        toRows()
-            .map { "[%7.4f, %7.4f, %7.4f, %7.4f]".format(it[0], it[1], it[2], it[3]) }
+    override fun toString(): String {
+        val precision = 8
+        val elements = toRows().flatten()
+        val nDigits = max(log10(elements.max()!!).toInt() + 1, 1)
+        val length = (if (elements.any { it < 0 }) 1 else 0) + nDigits + 1 + precision
+        val strings = elements.map { it.format(length, precision) }
+        val maxLength = strings.map { it.length }.max()!!
+        return strings
+            .map { it.padEnd(maxLength, ' ') }
+            .chunked(4).map { it.joinToString(" ", "[", "]") }
             .joinToString("\n ", "[", "]")
+    }
 
     /**
      * 行列の生成に使う機能

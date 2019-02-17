@@ -117,7 +117,18 @@ data class Matrix3(
                 m31.isClose(other.m31) && m32.isClose(other.m32) && m33.isClose(m33)
 
     /** 表示用の文字列に変換 */
-    override fun toString(): String = toRows().joinToString("\n ", "[", "]")
+    override fun toString(): String {
+        val precision = 8
+        val elements = listOf(m11, m12, m13, m21, m22, m23, m31, m32, m33)
+        val nDigits = max(log10(elements.max()!!).toInt() + 1, 1)
+        val length = (if (elements.any { it < 0 }) 1 else 0) + nDigits + 1 + precision
+        val strings = elements.map { it.format(length, precision) }
+        val maxLength = strings.map { it.length }.max()!!
+        return strings
+            .map { it.padEnd(maxLength, ' ') }
+            .chunked(3).map { it.joinToString(" ", "[", "]") }
+            .joinToString("\n ", "[", "]")
+    }
 
     /**
      * 行列の生成に使う機能

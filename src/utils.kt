@@ -8,3 +8,9 @@ import kotlin.math.*
 fun Double.isClose(other: Double, rtol: Double = 1e-5, atol: Double = 1e-8): Boolean {
     return abs(this - other) <= (atol + rtol * abs(other))
 }
+
+/**
+ * 浮動小数点数を表示用の文字列に変換する。
+ */
+fun Double.format(length: Int, precision: Int) =
+    ("%" + length + "." + precision + "f").format(this).trimEnd('0')

@@ -58,7 +58,15 @@ data class Vector3(val x: Double, val y: Double, val z: Double) {
     fun toList() = listOf(x, y, z)
 
     /** 表示用の文字列に変換 */
-    override fun toString(): String = "[%7.4f, %7.4f, %7.4f]".format(x, y, z)
+    override fun toString(): String {
+        val precision = 8
+        val elements = listOf(x, y, z)
+        val nDigits = max(log10(elements.max()!!).toInt() + 1, 1)
+        val length = (if (elements.any { it < 0 }) 1 else 0) + nDigits + 1 + precision
+        val strings = elements.map { it.format(length, precision) }
+        val maxLength = strings.map { it.length }.max()!!
+        return strings.map { it.padEnd(maxLength, ' ') }.joinToString("\n ", "[", "]")
+    }
 
     /**
      * @property zero   ゼロベクトル
