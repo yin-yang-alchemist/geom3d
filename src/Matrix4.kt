@@ -20,7 +20,7 @@ data class Matrix4(val rot: Matrix3, val trans: Vector3) {
         Matrix4(this.rot * other.rot, this.rot * other.trans + this.trans)
 
     /** 行を取得 */
-    fun toCols(): List<List<Double>> =
+    private fun toCols(): List<List<Double>> =
         listOf(
             rot.cols[0].toList() + 0.0,
             rot.cols[1].toList() + 0.0,
@@ -29,7 +29,7 @@ data class Matrix4(val rot: Matrix3, val trans: Vector3) {
         )
 
     /** 列を取得 */
-    fun toRows(): List<List<Double>> =
+    private fun toRows(): List<List<Double>> =
         listOf(
             rot.rows[0].toList() + trans.x,
             rot.rows[1].toList() + trans.y,
@@ -38,7 +38,7 @@ data class Matrix4(val rot: Matrix3, val trans: Vector3) {
         )
 
     /** 逆行列の計算 */
-    fun computeInverse() = when {
+    private fun computeInverse() = when {
         rot.inv == null -> null
         else -> Matrix4(rot.inv!!, -(rot.inv!! * trans))
     }
