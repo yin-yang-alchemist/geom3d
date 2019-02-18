@@ -73,7 +73,9 @@ internal class Matrix3Test {
         for (count in 1..100) {
             val vec = Vector3.random()
             val mat = Matrix3.random()
-            assertArrayEquals(vec.toArray(), (mat.inv!! * (mat * vec)).toArray(), TOL)
+            if (mat != null) {
+                assertArrayEquals(vec.toArray(), (mat.inv!! * (mat * vec)).toArray(), TOL)
+            }
         }
         // 回転行列をかけて長さが変わらないことをチェックする
         for (count in 1..100) {
