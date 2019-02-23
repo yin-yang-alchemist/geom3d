@@ -73,7 +73,7 @@ internal class Matrix3Test {
         for (count in 1..100) {
             val vec = Vector3.random()
             val mat = Matrix3.random()
-            if (mat != null) {
+            if (mat.inv != null) {
                 assertArrayEquals(vec.toArray(), (mat.inv!! * (mat * vec)).toArray(), TOL)
             }
         }

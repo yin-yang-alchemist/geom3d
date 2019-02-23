@@ -94,7 +94,6 @@ internal class Matrix4Test {
         // 単位行列をかける
         for (count in 1..100) {
             val vec = Vector3.random()
-            val k = Random.nextDouble()
             assertArrayEquals(vec.toArray(), (Matrix4.identity.transform(vec)).toArray(), TOL)
         }
         // 行列をかけてさらに逆行列をかけた時に元のベクトルに戻ることをチェックする
