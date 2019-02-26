@@ -1,6 +1,9 @@
 import kotlin.math.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.offset
 
 internal class Vector3Test {
 
@@ -11,18 +14,34 @@ internal class Vector3Test {
     private fun Vector3.toArray() = doubleArrayOf(x, y, z)
 
     @Test
-    fun getLength() {
-        assertEquals(0.0, Vector3.zero.length, TOL)
-        assertEquals(1.0, Vector3.unitX.length, TOL)
-        assertEquals(1.0, Vector3.unitY.length, TOL)
-        assertEquals(1.0, Vector3.unitZ.length, TOL)
-        assertEquals(5.0, Vector3(3.0, 4.0, 0.0).length, TOL)
+    @DisplayName("length ゼロベクトルの長さが0")
+    fun length_zero() {
+        assertThat(Vector3.zero.length).isEqualTo(0.0, offset(TOL))
+    }
+
+    @Test
+    @DisplayName("length XYZ軸の単位ベクトルの長さが1")
+    fun length_unit() {
+        assertThat(Vector3.unitX.length).isEqualTo(1.0, offset(TOL))
+        assertThat(Vector3.unitY.length).isEqualTo(1.0, offset(TOL))
+        assertThat(Vector3.unitZ.length).isEqualTo(1.0, offset(TOL))
+    }
+
+    @Test
+    @DisplayName("length (3, 4, 0)の長さが5")
+    fun length_5() {
+        assertThat(Vector3(3.0, 4.0, 0.0).length).isEqualTo(5.0, offset(TOL))
+    }
+
+    @Test
+    @DisplayName("length 長さが1~100のベクトル")
+    fun length_1to100() {
         for (count in 1..100) {
             val len = count.toDouble()
             val vec1 = Vector3(len * sqrt(1.0 / 3), len * sqrt(1.0 / 3), len * sqrt(1.0 / 3))
-            assertEquals(len, vec1.length, TOL)
+            assertThat(vec1.length).isCloseTo(len, offset(TOL))
             val vec2 = Vector3(len * sqrt(1.0 / 2), len * sqrt(1.0 / 4), len * sqrt(1.0 / 4))
-            assertEquals(len, vec2.length, TOL)
+            assertThat(vec2.length).isCloseTo(len, offset(TOL))
         }
     }
 
