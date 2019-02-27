@@ -11,7 +11,7 @@ import org.assertj.core.api.Assertions.offset
 internal class Vector3Test {
 
     /** 許容値 */
-    private val TOL = 1e-9
+    private val TOL = 1e-8
 
     /** Vector3をJava配列に変換する（値を比較できるようにするため） */
     private fun Vector3.toArray() = doubleArrayOf(x, y, z)

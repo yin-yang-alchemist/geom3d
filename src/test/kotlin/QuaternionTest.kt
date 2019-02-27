@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.*
 internal class QuaternionTest {
 
     /** 許容値 */
-    private val TOL = 1e-9
+    private val TOL = 1e-8
 
     /** Vector3をJava配列に変換する（assertArrayEqualsに渡すため） */
     private fun Vector3.toArray() = doubleArrayOf(x, y, z)
